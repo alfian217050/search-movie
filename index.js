@@ -1,4 +1,4 @@
-/* Fetch refactor (Async Await) */
+/* Fetch Refactor (Async Await) */
 const searchButton = document.body.querySelector(".search-button");
 searchButton.addEventListener("click", async function () {
 	try {
@@ -28,9 +28,7 @@ function getMovies(keyword) {
 
 function updateUI(movies) {
 	let cards = "";
-	movies.forEach((movie) => {
-		cards += showCards(movie);
-	});
+	movies.forEach((movie) => (cards += showCards(movie)));
 	const movieContainer = document.body.querySelector(".movie-container");
 	movieContainer.innerHTML = cards;
 }
@@ -38,14 +36,23 @@ function updateUI(movies) {
 /* Ketika tombol Show Details di-klik */
 document.addEventListener("click", async function (e) {
 	if (e.target.classList.contains("modal-detail-button")) {
-		const imdbid = e.target.dataset.imdbid;
-		const movieDetail = await getMovieDetail(imdbid);
-		updateUIDetail(movieDetail);
+		try {
+			const imdbid = e.target.dataset.imdbid;
+			const movieDetail = await getMovieDetail(imdbid);
+			updateUIDetail(movieDetail);
+		} catch (err) {
+			const modalBody = document.body.querySelector(".modal-body");
+			modalBody.innerHTML = modalError(err);
+		}
 	}
 });
 
-function getMovieDetail(mDetail) {
-	return fetch(`https://www.omdbapi.com/?apikey=9da156cc&i=${mDetail}`)
+function modalError(err) {
+	return `<h1 class="text-center">${err}</h1>`;
+}
+
+function getMovieDetail(imdbid) {
+	return fetch(`https://www.omdbapi.com/?apikey=9da156cc&i=${imdbid}`)
 		.then((response) => {
 			if (!response.ok) {
 				throw new Error(response.statusText);
